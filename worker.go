@@ -36,6 +36,10 @@ func Worker(url string, timeout time.Duration, requests int, concurrency int) ch
 			start := time.Now()
 
 			resp, err := client.Get(url)
+			if resp != nil {
+				defer resp.Body.Close()
+			}
+
 			latency := time.Since(start)
 
 			if err != nil || resp.StatusCode >= 400 {
@@ -44,9 +48,6 @@ func Worker(url string, timeout time.Duration, requests int, concurrency int) ch
 				results <- Result{Success: true, Latency: latency}
 			}
 
-			if resp != nil {
-				resp.Body.Close()
-			}
 		}()
 	}
 
